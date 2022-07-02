@@ -1,8 +1,8 @@
 from dagster import job
 
-from orchestration.ops import download_items
-from orchestration.resources.coches_net import coches_net_resource
-from orchestration.resources.duckdb_parquet_io_manager import duckdb_parquet_io_manager
+from ops import download_items
+from resources.coches_net import coches_net_resource
+from resources.duckdb_parquet_io_manager import duckdb_parquet_io_manager
 
 my_coches_resource = coches_net_resource.configured({})
 

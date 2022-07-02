@@ -1,7 +1,7 @@
 import os
 
 import duckdb
-import pandas
+import pandas as pd
 
 from dagster import Field, AssetMaterialization, AssetKey
 from dagster import io_manager
@@ -28,18 +28,19 @@ class DuckDBParquetIOManager(ParquetIOManager):
                 AssetMaterialization(
                     asset_key=AssetKey(table_name),
                     description=f"Created table {table_name} in DuckDB",
-                    metadata={
-                        "number of rows": obj.shape[0]
-                    },
-                ))
+                    metadata={"number of rows": obj.shape[0]},
+                )
+            )
 
-    def load_input(self, context) -> pandas.DataFrame:
+    def load_input(self, context) -> pd.DataFrame:
         con = self._connect_duckdb(context)
         table_name = context.upstream_output.name
         return con.execute(f"SELECT * FROM {table_name}").fetchdf()
 
     def _connect_duckdb(self, context):
-        return duckdb.connect(database=context.resource_config["duckdb_path"], read_only=False)
+        return duckdb.connect(
+            database=context.resource_config["duckdb_path"], read_only=False
+        )
 
 
 @io_manager(
@@ -47,5 +48,7 @@ class DuckDBParquetIOManager(ParquetIOManager):
 )
 def duckdb_parquet_io_manager(init_context):
     return DuckDBParquetIOManager(
-        base_path=init_context.resource_config.get("base_path", get_system_temp_directory())
+        base_path=init_context.resource_config.get(
+            "base_path", get_system_temp_directory()
+        )
     )
