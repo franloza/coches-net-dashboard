@@ -1,0 +1,92 @@
+version: "3.8"
+services:
+  # This service runs the postgres DB used by dagster for run storage, schedule storage,
+  # and event log storage.
+  dagster_postgresql:
+    image: postgres:11
+    container_name: dagster_postgresql
+    environment:
+      POSTGRES_USER: "dagster"
+      POSTGRES_PASSWORD: "root"
+      POSTGRES_DB: "dagster_db"
+    networks:
+      - dagster_network
+
+  # This service runs dagit, which loads the pipelines.
+  # Since our instance uses the QueuedRunCoordinator, any runs submitted from dagit will be put on
+  # a queue and later dequeued and launched by dagster-daemon.
+  dagster_dagit:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    entrypoint:
+      - dagit
+      - -h
+      - "0.0.0.0"
+      - -p
+      - "3000"
+      - -w
+      - workspace.yaml
+    container_name: dagster_dagit
+    expose:
+      - "3000"
+    ports:
+      - "3000:3000"
+    environment:
+      DAGSTER_POSTGRES_USER: "dagster"
+      DAGSTER_POSTGRES_PASSWORD: "root"
+      DAGSTER_POSTGRES_DB: "dagster_db"
+    volumes:
+      # Make docker client accessible so we can terminate containers from dagit
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - dagster_network
+    depends_on:
+      - dagster_postgresql
+
+  # This service runs the dagster-daemon process, which is responsible for taking runs
+  # off of the queue and launching them, as well as creating runs from schedules or sensors.
+  dagster_daemon:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    entrypoint:
+      - dagster-daemon
+      - run
+    container_name: dagster_daemon
+    restart: on-failure
+    environment:
+      DAGSTER_POSTGRES_USER: "dagster"
+      DAGSTER_POSTGRES_PASSWORD: "root"
+      DAGSTER_POSTGRES_DB: "dagster_db"
+    volumes:
+      # Make docker client accessible so we can launch containers using host docker
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - dagster_network
+    depends_on:
+      - dagster_postgresql
+
+  # Repositories
+  data_manager:
+    build:
+      context: data_manager/
+      dockerfile: ./Dockerfile
+    container_name: data_manager
+    image: data_manager_image
+    environment:
+      DAGSTER_CURRENT_IMAGE: "data_manager_image"
+      DAGSTER_POSTGRES_USER: "dagster"
+      DAGSTER_POSTGRES_PASSWORD: "root"
+      DAGSTER_POSTGRES_DB: "dagster_db"
+    networks:
+      - dagster_network
+    volumes:
+      - /tmp:/tmp
+    ports:
+      - "4444:4444"
+
+networks:
+  dagster_network:
+    driver: bridge
+    name: dagster_network
