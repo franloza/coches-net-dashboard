@@ -6,9 +6,9 @@ setuptools.setup(
     install_requires=[
         "dagster==0.15.0",
         "dagit==0.15.0",
-        "dagster-pandas==0.15.1",
+        "dagster-pandas==0.15.0",
         "duckdb==0.4.0",
-        "pyarrow==8.0.0"
+        "pyarrow==8.0.0",
         "pytest",
     ],
 )
