@@ -82,7 +82,7 @@ services:
     networks:
       - dagster_network
     volumes:
-      - /tmp:/tmp
+      - ./data:/tmp
     ports:
       - "4444:4444"
 

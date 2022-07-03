@@ -9,16 +9,18 @@ RUN pip install \
     dagster-postgres==0.15.0 \
     dagster-docker==0.15.0
 
-# Add repository code
+# Prepare repository path
 RUN mkdir orchestration/
 RUN mkdir data_manager/
 WORKDIR /orchestration/data_manager
-COPY . .
 
 # Install dependencies
+COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 ENV PYTHONPATH "${PYTHONPATH}:/orchestration/data_manager/repository/"
+
+COPY . .
 
 # Run dagster gRPC server on port 4444
 EXPOSE 4444
