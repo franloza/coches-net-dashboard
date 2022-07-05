@@ -1,10 +1,16 @@
 import os
-from typing import Union
+from datetime import datetime
 
-import pandas
 import pandas as pd
+import pyarrow.parquet as pq
+import pyarrow as pa
 
-from dagster import AssetKey, IOManager, MetadataEntry, OutputContext, AssetMaterialization
+from dagster import (
+    AssetKey,
+    IOManager,
+    MetadataEntry,
+    OutputContext,
+)
 
 
 class ParquetIOManager(IOManager):
@@ -17,27 +23,32 @@ class ParquetIOManager(IOManager):
     Downstream ops can load this dataframe
     """
 
-    def __init__(self, base_path):
-        self._base_path = base_path
+    def __init__(self, download_path: str):
+        if download_path.startswith("./"):
+            download_path = os.path.join(os.getcwd(), download_path[2:])
+        self._download_path = download_path
 
-    def handle_output(
-        self, context: OutputContext, obj: pandas.DataFrame
-    ):
+    def handle_output(self, context: OutputContext, obj: pd.DataFrame):
         path = self._get_path(context)
-        if "://" not in self._base_path:
+        if "://" not in self._download_path:
             os.makedirs(os.path.dirname(path), exist_ok=True)
         row_count = len(obj)
-        obj.to_parquet(path=path, index=False)
+        table = pa.Table.from_pandas(obj)
+        pq.write_to_dataset(
+            table,
+            root_path=path,
+            partition_filename_cb=lambda x: f"{datetime.utcnow().strftime('%Y_%m_%d')}_{x}.parquet",
+        )  # It appends by default
         context.log.info(f"Parquet file written {path}")
         yield MetadataEntry.int(value=row_count, label="row_count")
         yield MetadataEntry.path(path=path, label="path")
 
-    def load_input(self, context) -> pandas.DataFrame:
+    def load_input(self, context) -> pd.DataFrame:
         path = self._get_path(context.upstream_output)
         return pd.read_parquet(path)
 
     def _get_path(self, context: OutputContext):
-        return os.path.join(self._base_path, f"{context.name}.parquet")
+        return self._download_path
 
     def get_output_asset_key(self, context: OutputContext):
-        return AssetKey([*self._base_path.split("://"), context.name])
+        return AssetKey([*self._download_path.split("://"), context.name])
