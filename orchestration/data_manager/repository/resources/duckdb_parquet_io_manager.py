@@ -19,13 +19,15 @@ class DuckDBParquetIOManager(ParquetIOManager):
             duckdb_path = os.path.join(os.getcwd(), duckdb_path[2:])
         self._duckdb_path = duckdb_path
 
-    def handle_output(self, context, obj):
+    def handle_output(self, context, obj: dict):
         if obj is not None:
             yield from super().handle_output(context, obj)
             con = self._connect_duckdb(context)
 
-            to_scan = os.path.join(self._download_path, "*.parquet")
-            table_name = context.name
+            market = obj["target_market"]
+
+            to_scan = os.path.join(self._download_path, f"*_{market}_*.parquet")
+            table_name = market
             con.execute(
                 f"CREATE OR REPLACE TABLE {table_name} AS SELECT * FROM '{to_scan}';"
             )

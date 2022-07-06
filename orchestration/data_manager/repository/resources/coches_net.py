@@ -16,17 +16,20 @@ MAX_PAGE_SIZE = 100
 
 class CochesNetResource:
     """
-    This class exposes methods on top of the Coches.net API.
+    This class exposes methods on top of the Motos/Coches.net API.
     """
 
     def __init__(
         self,
+        target_market: str = "coches",
         request_max_retries: int = 3,
         request_retry_delay: float = 0.25,
         log: logging.Logger = get_dagster_logger(),
     ):
         self._request_max_retries = request_max_retries
         self._request_retry_delay = request_retry_delay
+        assert target_market in {"coches", "motos"}
+        self._target_market = target_market
 
         self._log = log
 
@@ -42,9 +45,7 @@ class CochesNetResource:
         Returns:
             str: The constructed User-Agent value.
         """
-        python_version = (
-            f"Python/{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
-        )
+        python_version = f"Python/{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
         return python_version
 
     def _construct_headers(self, compressed=False) -> Dict[str, str]:
@@ -60,12 +61,14 @@ class CochesNetResource:
         headers["User-Agent"] = self._construct_user_agent()
         headers["Content-Type"] = "application/json;charset=utf-8"
         headers["Accept"] = "application/json"
-        headers["X-Schibsted-Tenant"] = "coches"
+        headers["X-Schibsted-Tenant"] = self._target_market
         if compressed:
             headers["Accept-Encoding"] = "gzip, deflate, br"
         return headers
 
-    def make_request(self, method: str, endpoint: str, data: str = None, compressed=False) -> Dict[str, Any]:
+    def make_request(
+        self, method: str, endpoint: str, data: str = None, compressed=False
+    ) -> Dict[str, Any]:
         """
         Creates and sends a request to an endpoint.
 
@@ -114,25 +117,37 @@ class CochesNetResource:
         total_pages = None
         finished = False
         while not finished:
-            data = {"pagination": {"page": num_page, "size": MAX_PAGE_SIZE},
-                    "sort": {"order": "desc", "term": "publishedDate"}}
+            data = {
+                "pagination": {"page": num_page, "size": MAX_PAGE_SIZE},
+                "sort": {"order": "desc", "term": "publishedDate"},
+            }
             response = self.make_request(
                 method="POST", endpoint="search", data=json.dumps(data)
             )
             if total_pages is None:
                 total_pages = int(response["meta"]["totalPages"])
-                self._log.info(f'Estimated total records:  {total_pages*MAX_PAGE_SIZE} records')
-            if (num_page == total_pages) or (limit is not None and num_page*MAX_PAGE_SIZE >= limit):
+                self._log.info(
+                    f"Estimated total records:  {total_pages*MAX_PAGE_SIZE} records"
+                )
+            if (num_page == total_pages) or (
+                limit is not None and num_page * MAX_PAGE_SIZE >= limit
+            ):
                 finished = True
             num_page += 1
-            num_records += len(response['items'])
+            num_records += len(response["items"])
             if num_records % 10000 == 0:
-                self._log.info(f'Processed {num_records} records')
-            yield from response['items']
+                self._log.info(f"Processed {num_records} records")
+            yield from response["items"]
 
 
 @resource(
     config_schema={
+        "target_market": Field(
+            str,
+            default_value="coches",
+            description="The market of vehicles that the API will target. `coches` will retrieve cars "
+            "while `motos` will retrive motorbikes.",
+        ),
         "request_max_retries": Field(
             int,
             default_value=3,
@@ -168,6 +183,7 @@ def coches_net_resource(context) -> CochesNetResource:
 
     """
     return CochesNetResource(
+        target_market=context.resource_config["target_market"],
         request_max_retries=context.resource_config["request_max_retries"],
         request_retry_delay=context.resource_config["request_retry_delay"],
         log=context.log,

@@ -14,7 +14,7 @@ import pandas as pd
         )
     },
 )
-def download_items(context) -> pd.DataFrame:
+def download_items(context) -> dict:
     """
     Downloads all of the items and creates a DataFrame with all the entries.
     """
@@ -28,4 +28,10 @@ def download_items(context) -> pd.DataFrame:
         context.resources.coches_net_resource.search(limit=max_items), sep="_"
     )
     context.log.info(f"All records downloaded: {result.shape[0]} records")
-    return Output(result, "items")
+    return Output(
+        {
+            "items": result,
+            "target_market": context.resources.coches_net_resource._target_market,
+        },
+        "items",
+    )

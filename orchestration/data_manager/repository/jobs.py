@@ -22,7 +22,8 @@ local_config = {
                 "download_path": "./orchestration/data/items.parquet",  # relative from workspace path
                 "duckdb_path": "./orchestration/data/coches.net.duckdb",
             }
-        }
+        },
+        "coches_net_resource": {"config": {"target_market": "motos"}},
     }
 }
 
