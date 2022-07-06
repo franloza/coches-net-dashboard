@@ -25,6 +25,7 @@ class DuckDBParquetIOManager(ParquetIOManager):
             con = self._connect_duckdb(context)
 
             market = obj["target_market"]
+            df = obj["items"]
 
             to_scan = os.path.join(self._download_path, f"*_{market}_*.parquet")
             table_name = market
@@ -35,7 +36,7 @@ class DuckDBParquetIOManager(ParquetIOManager):
                 AssetMaterialization(
                     asset_key=AssetKey(table_name),
                     description=f"Created table {table_name} in DuckDB",
-                    metadata={"number of rows": obj.shape[0]},
+                    metadata={"number of rows": df.shape[0]},
                 )
             )
 
