@@ -1,9 +1,9 @@
 -- The API produces duplicates due to pagination
 select distinct
-    id as car_id,
+    id as motorcycle_id,
     creationDate::timestamp as creation_date,
     title,
-    'www.coches.net' || url as url,
+    'www.motos.net' || url as url,
     coalesce(km, 0)::int as km,
     year::int as year,
     cubicCapacity as cubic_capacity,
@@ -14,10 +14,6 @@ select distinct
     isProfessional as is_professional,
     publishedDate::timestamp as published_date,
     price_amount as price,
-    price_financedAmount as financed_price,
-    price_hasTaxes::boolean as price_has_taxes,
-    warranty_months::int as warranty_months,
-    offerType_literal as offer_type,
-    hasStock::boolean as has_stock,
-    environmentalLabel as environmental_label
-from {{ source('coches_net', 'cars') }}
+    warranty_literal as warranty,
+    offerType_literal as offer_type
+from {{ source('coches_net', 'motorcycles') }}

@@ -14,7 +14,7 @@ sources:
 
     tables:
       - name: cars
-        identifier: items
+        identifier: coches
         columns:
           - name: id
           - name: creationDate
@@ -49,6 +49,36 @@ sources:
           - name: offerType_id
           - name: offerType_literal
           - name: hasStock
+
+      - name: motorcycles
+        identifier: motos
+        columns:
+          - name: id
+          - name: creationDate
+          - name: title
+          - name: url
+          - name: km
+          - name: year
+          - name: cubicCapacity
+          - name: provinceIds
+          - name: mainProvince
+          - name: resources
+          - name: fuelTypeId
+          - name: fuelType
+          - name: bodyTypeId
+          - name: isFinanced
+          - name: isCertified
+          - name: isProfessional
+          - name: publishedDate
+          - name: hasUrge
+          - name: phone
+          - name: price_amount
+          - name: location_provinceIds
+          - name: location_mainProvince
+          - name: location_mainProvinceId
+          - name: warranty_literal
+          - name: offerType_id
+          - name: offerType_literal
 
   - name: snapshots
     schema: snapshots
@@ -86,3 +116,29 @@ sources:
           - name: dbt_updated_at
           - name: dbt_valid_from
           - name: dbt_valid_to
+
+      - name: motorcycles_snapshots
+        columns:
+          - name: id
+          - name: creationDate
+          - name: title
+          - name: url
+          - name: km
+          - name: year
+          - name: cubicCapacity
+          - name: mainProvince
+          - name: fuelType
+          - name: isFinanced
+          - name: isCertified
+          - name: isProfessional
+          - name: publishedDate
+          - name: price_amount
+          - name: location_mainProvince
+          - name: warranty_literal
+          - name: offerType_literal
+          - name: dbt_scd_id
+          - name: dbt_updated_at
+          - name: dbt_valid_from
+          - name: dbt_valid_to
+
+
