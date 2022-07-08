@@ -136,6 +136,7 @@ dmypy.json
 
 # DuckDB
 *.duckdb
+*.wal
 
 # PyCharm
 *.idea

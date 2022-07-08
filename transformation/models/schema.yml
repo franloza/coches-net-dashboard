@@ -1,0 +1,29 @@
+version: 2
+
+models:
+  - name: stg_cars
+    columns:
+      - name: id
+        tests:
+          # WTF There are duplicate ids.
+          # TODO: Solve this before adding snapshots. We need a unique key.
+          ##- unique
+          - not_null
+      - name: creation_date
+      - name: title
+      - name: url
+      - name: km
+      - name: year
+      - name: cubic_capacity
+      - name: main_province
+      - name: fuel_type
+      - name: is_financed
+      - name: is_certified
+      - name: is_professional
+      - name: published_date
+      - name: price
+      - name: financed_price
+      - name: price_has_taxes
+      - name: warranty_months
+      - name: offer_type
+      - name: has_stock

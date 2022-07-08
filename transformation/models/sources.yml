@@ -1,0 +1,51 @@
+version: 2
+
+sources:
+  - name: coches_net
+    schema: main
+
+    loader: dagster
+    # TODO: Add to ETL
+    #loaded_at_field: _extracted_at
+
+#    freshness:
+#      warn_after: {count: 72, period: hour}
+#      error_after: {count: 168, period: hour}
+
+    tables:
+      - name: items
+        columns:
+          - name: id
+          - name: creationDate
+          - name: title
+          - name: url
+          - name: km
+          - name: year
+          - name: cubicCapacity
+          - name: provinceIds
+          - name: mainProvince
+          - name: resources
+          - name: fuelTypeId
+          - name: fuelType
+          - name: bodyTypeId
+          - name: isFinanced
+          - name: isCertified
+          - name: isProfessional
+          - name: publishedDate
+          - name: hasUrge
+          - name: phone
+          - name: environmentalLabel
+          - name: drivenWheelsId
+          - name: price_amount
+          - name: price_financedAmount
+          - name: price_taxTypeId
+          - name: price_hasTaxes
+          - name: location_provinceIds
+          - name: location_mainProvince
+          - name: location_mainProvinceId
+          - name: warranty_id
+          - name: warranty_months
+          - name: offerType_id
+          - name: offerType_literal
+          - name: hasStock
+

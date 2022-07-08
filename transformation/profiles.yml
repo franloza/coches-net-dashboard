@@ -1,0 +1,10 @@
+config:
+  send_anonymous_usage_stats: false
+
+default:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ../orchestration/coches.net.duckdb
+      threads: 1
