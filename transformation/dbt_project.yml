@@ -16,6 +16,9 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+vars:
+  the_distant_future: '2040-01-01'
+
 models:
   coches_net:
     example:

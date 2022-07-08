@@ -13,7 +13,8 @@ sources:
 #      error_after: {count: 168, period: hour}
 
     tables:
-      - name: items
+      - name: cars
+        identifier: items
         columns:
           - name: id
           - name: creationDate
@@ -49,3 +50,39 @@ sources:
           - name: offerType_literal
           - name: hasStock
 
+  - name: snapshots
+    schema: snapshots
+
+    loader: dbt
+
+    tables:
+      - name: cars_snapshots
+        columns:
+          - name: id
+          - name: creationDate
+          - name: title
+          - name: url
+          - name: km
+          - name: year
+          - name: cubicCapacity
+          - name: mainProvince
+          - name: fuelType
+          - name: isFinanced
+          - name: isCertified
+          - name: isProfessional
+          - name: publishedDate
+          - name: hasUrge
+          - name: environmentalLabel
+          - name: price_amount
+          - name: price_financedAmount
+          - name: price_taxTypeId
+          - name: price_hasTaxes
+          - name: location_mainProvince
+          - name: warranty_id
+          - name: warranty_months
+          - name: offerType_literal
+          - name: hasStock
+          - name: dbt_scd_id
+          - name: dbt_updated_at
+          - name: dbt_valid_from
+          - name: dbt_valid_to

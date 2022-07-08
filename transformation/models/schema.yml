@@ -5,9 +5,7 @@ models:
     columns:
       - name: id
         tests:
-          # WTF There are duplicate ids.
-          # TODO: Solve this before adding snapshots. We need a unique key.
-          ##- unique
+          - unique
           - not_null
       - name: creation_date
       - name: title
@@ -27,3 +25,39 @@ models:
       - name: warranty_months
       - name: offer_type
       - name: has_stock
+
+  - name: stg_cars_snapshots
+    columns:
+      - name: scd_id
+        tests:
+          - unique
+          - not_null
+      - name: car_id
+        tests:
+          - unique:
+              config:
+                where: "is_current_version"
+          - not_null
+      - name: creation_date
+      - name: title
+      - name: url
+      - name: km
+      - name: year
+      - name: cubic_capacity
+      - name: main_province
+      - name: fuel_type
+      - name: is_financed
+      - name: is_certified
+      - name: is_professional
+      - name: published_date
+      - name: price
+      - name: financed_price
+      - name: price_has_taxes
+      - name: warranty_months
+      - name: offer_type
+      - name: has_stock
+      - name: updated_at
+      - name: is_current_version
+      - name: version
+      - name: valid_from
+      - name: valid_to

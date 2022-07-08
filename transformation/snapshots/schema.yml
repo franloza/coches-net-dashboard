@@ -1,0 +1,4 @@
+version: 2
+
+snapshots:
+  - name: cars_snapshots
