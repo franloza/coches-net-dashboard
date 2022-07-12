@@ -6,5 +6,6 @@ default:
   outputs:
     dev:
       type: duckdb
+      schema: analytics
       path: ../orchestration/data/coches.net.duckdb
       threads: 1

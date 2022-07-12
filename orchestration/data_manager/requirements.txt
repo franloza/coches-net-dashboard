@@ -1,4 +1,6 @@
 dagster==0.15.0
+dagster-dbt==0.15.0,
+dbt-duckdb==1.1.4
 dagit==0.15.0
 duckdb==0.4.0
 pandas==1.4.3

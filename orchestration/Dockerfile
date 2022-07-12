@@ -5,7 +5,8 @@ RUN pip install \
     dagster-graphql==0.15.0 \
     dagit==0.15.0 \
     dagster-postgres==0.15.0 \
-    dagster-docker==0.15.0
+    dagster-docker==0.15.0 \
+    dagster-dbt==0.15.0
 
 # Set $DAGSTER_HOME and copy dagster instance and workspace YAML there
 ENV DAGSTER_HOME=/opt/dagster/dagster_home/
