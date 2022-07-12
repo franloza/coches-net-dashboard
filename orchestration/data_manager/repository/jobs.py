@@ -1,6 +1,6 @@
 from dagster import job
 
-from ops import download_items
+from ops import download_items_op_factory
 from resources.coches_net import coches_net_resource
 from resources.duckdb_parquet_io_manager import duckdb_parquet_io_manager
 
@@ -23,23 +23,23 @@ local_config = {
                 "duckdb_path": "./orchestration/data/coches.net.duckdb",
             }
         },
-        "coches_net_resource": {"config": {"target_market": "motos"}},
     }
 }
 
 
 @job(
     resource_defs={
-        "coches_net_resource": coches_net_resource,
         "warehouse_io_manager": duckdb_parquet_io_manager,
+        "coches_net_resource": coches_net_resource
     }
 )
-def build_cars_dataset_job():
+def build_datasets_job():
     """
-    Downloads all items from the Coches.net API.
+    Downloads all cars and motorbikes from the Coches.net API.
     """
-    items = download_items()
+    cars = download_items_op_factory(target_market="coches")()
+    motorbikes = download_items_op_factory(target_market="motos")()
 
 
 if __name__ == "__main__":
-    build_cars_dataset_job.execute_in_process(run_config=local_config)
+    build_datasets_job.execute_in_process(run_config=local_config)

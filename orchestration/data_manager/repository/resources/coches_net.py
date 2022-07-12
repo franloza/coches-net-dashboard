@@ -116,6 +116,7 @@ class CochesNetResource:
         num_records = 0
         total_pages = None
         finished = False
+        self._log.info("Target market: %s", self._target_market)
         while not finished:
             data = {
                 "pagination": {"page": num_page, "size": MAX_PAGE_SIZE},
@@ -146,7 +147,7 @@ class CochesNetResource:
             str,
             default_value="coches",
             description="The market of vehicles that the API will target. `coches` will retrieve cars "
-            "while `motos` will retrive motorbikes.",
+            "while `motos` will retrieve motorbikes.",
         ),
         "request_max_retries": Field(
             int,

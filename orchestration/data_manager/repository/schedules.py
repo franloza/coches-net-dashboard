@@ -1,11 +1,11 @@
 from dagster import schedule
 
-from jobs import build_cars_dataset_job
+from jobs import build_datasets_job
 
 
 @schedule(
     cron_schedule="0 * * * *",
-    job=build_cars_dataset_job,
+    job=build_datasets_job,
     execution_timezone="US/Central",
 )
 def build_cars_dataset_schedule(_context):
