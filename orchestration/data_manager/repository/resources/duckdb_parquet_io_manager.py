@@ -13,22 +13,22 @@ from .parquet_io_manager import ParquetIOManager
 class DuckDBParquetIOManager(ParquetIOManager):
     """Stores data in parquet files and creates duckdb views over those files."""
 
-    def __init__(self, download_path: str, duckdb_path: str):
-        super().__init__(download_path)
-        if duckdb_path.startswith("./"):
-            duckdb_path = os.path.join(os.getcwd(), duckdb_path[2:])
+    def __init__(self, download_dir: str, duckdb_path: str):
+        super().__init__(download_dir)
         self._duckdb_path = duckdb_path
 
     def handle_output(self, context, obj: dict):
         if obj is not None:
             yield from super().handle_output(context, obj)
+            if "://" not in self._duckdb_path:
+                os.makedirs(os.path.dirname(self._duckdb_path), exist_ok=True)
+
             con = self._connect_duckdb(context)
 
-            market = obj["target_market"]
             df = obj["items"]
 
-            to_scan = os.path.join(self._download_path, f"*_{market}_*.parquet")
-            table_name = market
+            to_scan = self._get_path(context)
+            table_name = context.name
             con.execute(
                 f"CREATE OR REPLACE TABLE {table_name} AS SELECT * FROM '{to_scan}';"
             )
@@ -49,9 +49,9 @@ class DuckDBParquetIOManager(ParquetIOManager):
         return duckdb.connect(database=self._duckdb_path, read_only=False)
 
 
-@io_manager(config_schema={"download_path": str, "duckdb_path": str})
+@io_manager(config_schema={"download_dir": str, "duckdb_path": str})
 def duckdb_parquet_io_manager(init_context):
     return DuckDBParquetIOManager(
-        download_path=init_context.resource_config["download_path"],
+        download_dir=init_context.resource_config["download_dir"],
         duckdb_path=init_context.resource_config["duckdb_path"],
     )

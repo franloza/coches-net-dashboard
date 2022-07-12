@@ -23,26 +23,18 @@ class ParquetIOManager(IOManager):
     Downstream ops can load this dataframe
     """
 
-    def __init__(self, download_path: str):
-        if download_path.startswith("./"):
-            download_path = os.path.join(os.getcwd(), download_path[2:])
-        self._download_path = download_path
+    def __init__(self, download_dir: str):
+        self._download_dir = os.path.dirname(download_dir)
 
     def handle_output(self, context: OutputContext, obj: dict):
-        path = self._get_path(context)
-        if "://" not in self._download_path:
-            os.makedirs(os.path.dirname(path), exist_ok=True)
+        if "://" not in self._download_dir:
+            os.makedirs(self._download_dir, exist_ok=True)
 
-        market = obj["target_market"]
         df = obj["items"]
-
         row_count = len(df)
+        path = self._get_path(context)
         table = pa.Table.from_pandas(df)
-        pq.write_to_dataset(
-            table,
-            root_path=path,
-            partition_filename_cb=lambda x: f"{datetime.utcnow().strftime('%Y_%m_%d')}_{market}_{x}.parquet",
-        )  # It appends by default
+        pq.write_table(table, where=self._get_path(context))
         context.log.info(f"Parquet file written {path}")
         yield MetadataEntry.int(value=row_count, label="row_count")
         yield MetadataEntry.path(path=path, label="path")
@@ -52,7 +44,7 @@ class ParquetIOManager(IOManager):
         return pd.read_parquet(path)
 
     def _get_path(self, context: OutputContext):
-        return self._download_path
+        return os.path.join(self._download_dir, f"{context.name}.parquet")
 
     def get_output_asset_key(self, context: OutputContext):
-        return AssetKey([*self._download_path.split("://"), context.name])
+        return AssetKey([*self._download_dir.split("://"), context.name])

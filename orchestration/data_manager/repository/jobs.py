@@ -5,22 +5,22 @@ from resources.coches_net import coches_net_resource
 from resources.duckdb_parquet_io_manager import duckdb_parquet_io_manager
 
 
-docker_config = {
+DOCKER_CONFIG = {
     "resources": {
         "warehouse_io_manager": {
             "config": {
-                "download_path": "/tmp/items.parquet",
+                "download_dir": "/tmp/",
                 "duckdb_path": "/tmp/coches.net.duckdb",
             }
         }
     }
 }
-local_config = {
+LOCAL_CONFIG = {
     "resources": {
         "warehouse_io_manager": {
             "config": {
-                "download_path": "./orchestration/data/items.parquet",  # relative from workspace path
-                "duckdb_path": "./orchestration/data/coches.net.duckdb",
+                "download_dir": "/tmp/",
+                "duckdb_path": "../../data/coches.net.duckdb",
             }
         },
     }
@@ -42,4 +42,11 @@ def build_datasets_job():
 
 
 if __name__ == "__main__":
-    build_datasets_job.execute_in_process(run_config=local_config)
+    dev_config = dict(LOCAL_CONFIG)
+    # Uncomment to limit the number of records
+    # max_items = 1000
+    # dev_config['ops'] = {
+    #    'download_coches': {'config': {'max_items': max_items}},
+    #    'download_motos': {'config': {'max_items': max_items}}
+    # }
+    build_datasets_job.execute_in_process(run_config=dev_config)

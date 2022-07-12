@@ -8,7 +8,7 @@ def download_items_op_factory(
 ):
     @op(
         name=f"download_{target_market}",
-        out={"items": Out(io_manager_key="warehouse_io_manager")},
+        out={target_market: Out(io_manager_key="warehouse_io_manager")},
         required_resource_keys={"coches_net_resource"},
         config_schema={
             "max_items": Field(
@@ -37,10 +37,9 @@ def download_items_op_factory(
         context.log.info(f"All records downloaded: {result.shape[0]} records")
         return Output(
             {
-                "items": result,
-                "target_market": target_market,
+                "items": result
             },
-            "items",
+            target_market,
         )
 
     return download_items
