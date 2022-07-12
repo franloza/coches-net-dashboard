@@ -9,16 +9,6 @@ from resources.duckdb_parquet_io_manager import duckdb_parquet_io_manager
 
 DATABASE_FILE_NAME = 'coches.net.duckdb'
 TRANSFORMATION_DIR = os.path.abspath(file_relative_path(__file__, '../../../transformation'))
-DOCKER_CONFIG = {
-    "resources": {
-        "warehouse_io_manager": {
-            "config": {
-                "download_dir": "/tmp/",
-                "duckdb_path": f"/tmp/{DATABASE_FILE_NAME}",
-            }
-        }
-    }
-}
 LOCAL_CONFIG = {
     "resources": {
         "warehouse_io_manager": {
@@ -39,7 +29,8 @@ LOCAL_CONFIG = {
             "project_dir": TRANSFORMATION_DIR,
             "profiles_dir": TRANSFORMATION_DIR
         })
-    }
+    },
+    config=LOCAL_CONFIG
 )
 def build_datasets_job():
     """

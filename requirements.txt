@@ -1,8 +1,8 @@
 dagster==0.15.0
-dagster-dbt==0.15.0,
-dbt-duckdb==1.1.4
+dagster-pandas==0.15.0
 dagit==0.15.0
+dagster-dbt==0.15.0
+dbt-duckdb==1.1.4
 duckdb==0.4.0
-pandas==1.4.3
 pyarrow==8.0.0
 pytest

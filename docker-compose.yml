@@ -17,8 +17,9 @@ services:
   # a queue and later dequeued and launched by dagster-daemon.
   dagster_dagit:
     build:
-      context: .
+      context: ./orchestration
       dockerfile: ./Dockerfile
+    image: dagster
     entrypoint:
       - dagit
       - -h
@@ -48,8 +49,9 @@ services:
   # off of the queue and launching them, as well as creating runs from schedules or sensors.
   dagster_daemon:
     build:
-      context: .
+      context: ./orchestration
       dockerfile: ./Dockerfile
+    image: dagster
     entrypoint:
       - dagster-daemon
       - run
@@ -70,7 +72,7 @@ services:
   # Repositories
   data_manager:
     build:
-      context: data_manager/
+      context: .
       dockerfile: ./Dockerfile
     container_name: data_manager
     image: data_manager_image
@@ -82,7 +84,7 @@ services:
     networks:
       - dagster_network
     volumes:
-      - ./data:/tmp
+      - ./data:/orchestration/data
     ports:
       - "4444:4444"
 
