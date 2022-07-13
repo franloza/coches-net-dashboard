@@ -1,5 +1,4 @@
--- The API produces duplicates due to pagination
-select distinct
+select
     id as motorcycle_id,
     creationDate::timestamp as creation_date,
     title,
@@ -17,3 +16,5 @@ select distinct
     warranty_literal as warranty,
     offerType_literal as offer_type
 from {{ source('coches_net', 'motorcycles') }}
+-- The API produces duplicates due to pagination
+qualify row_number() over (partition by motorcycle_id order by published_date desc) = 1

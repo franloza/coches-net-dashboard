@@ -28,4 +28,6 @@ select distinct
     warranty_literal,
     offerType_literal
 from {{ source('coches_net', 'motorcycles') }}
+-- The API produces duplicates due to pagination
+qualify row_number() over (partition by id order by publishedDate desc) = 1
 {% endsnapshot %}

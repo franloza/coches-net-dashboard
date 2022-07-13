@@ -9,7 +9,7 @@
     )
 }}
 
-select distinct
+select
     id,
     creationDate,
     title,
@@ -35,4 +35,6 @@ select distinct
     offerType_literal,
     hasStock
 from {{ source('coches_net', 'cars') }}
+-- The API produces duplicates due to pagination
+qualify row_number() over (partition by id order by publishedDate desc) = 1
 {% endsnapshot %}

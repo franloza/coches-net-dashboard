@@ -1,5 +1,4 @@
--- The API produces duplicates due to pagination
-select distinct
+select
     id as car_id,
     creationDate::timestamp as creation_date,
     title,
@@ -21,3 +20,5 @@ select distinct
     hasStock::boolean as has_stock,
     environmentalLabel as environmental_label
 from {{ source('coches_net', 'cars') }}
+-- The API produces duplicates due to pagination
+qualify row_number() over (partition by car_id order by published_date desc) = 1
