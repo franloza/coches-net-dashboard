@@ -6,7 +6,7 @@
 
 with generate_date as (
         select cast(range as date) as date_key
-          from range(date '2009-01-01', date '2013-12-31', interval 1 day)
+          from range(current_date - interval 1 year, current_date + interval 1 day, interval 1 day)
           )
    select date_key as date_key,
           dayofyear(date_key) as day_of_year,
