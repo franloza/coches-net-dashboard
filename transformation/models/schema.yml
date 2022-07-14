@@ -85,6 +85,7 @@ models:
       - name: valid_from
       - name: valid_to
         
+
   - name: stg_motorcycles_snapshots
     columns:
       - name: scd_id
@@ -117,3 +118,14 @@ models:
       - name: version
       - name: valid_from
       - name: valid_to
+
+  - name: fct_car_prices
+    columns:
+      - name: car_id
+      - name: date_key
+      - name: price
+    tests:
+      - unique:
+          column_name: "(date_key || '-' || car_id)"
+          config:
+            where: date_key >= current_date - 3
