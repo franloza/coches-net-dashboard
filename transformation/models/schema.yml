@@ -124,8 +124,23 @@ models:
       - name: car_id
       - name: date_key
       - name: price
+        tests:
+          - not_null
     tests:
       - unique:
           column_name: "(date_key || '-' || car_id)"
+          config:
+            where: date_key >= current_date - 3
+
+  - name: fct_motorcycle_prices
+    columns:
+        - name: motorcycle_id
+        - name: date_key
+        - name: price
+          tests:
+            - not_null
+    tests:
+      - unique:
+          column_name: "(date_key || '-' || motorcycle_id)"
           config:
             where: date_key >= current_date - 3
