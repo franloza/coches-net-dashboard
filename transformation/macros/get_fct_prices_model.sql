@@ -31,6 +31,7 @@ spined as (
 
     select
         deduplicated.{{ primary_key }},
+        deduplicated.scd_id,
         deduplicated.price,
         dates.date_key
     from deduplicated
@@ -45,6 +46,7 @@ spined as (
 select
     date_key,
     {{ primary_key }},
+    scd_id,
     price
 from spined
 

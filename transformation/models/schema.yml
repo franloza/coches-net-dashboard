@@ -122,6 +122,7 @@ models:
   - name: fct_car_prices
     columns:
       - name: car_id
+      - name: scd_id
       - name: date_key
       - name: price
         tests:
@@ -135,6 +136,7 @@ models:
   - name: fct_motorcycle_prices
     columns:
         - name: motorcycle_id
+        - name: scd_id
         - name: date_key
         - name: price
           tests:
