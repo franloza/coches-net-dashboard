@@ -6,8 +6,22 @@ class DataProvider:
     """Class in charge of quering data from the DB"""
 
     def __init__(self) -> None:
+        try:
+            self.connect()
+        except RuntimeError:
+            self._con = None
+
+    @property
+    def connection(self):
+        if self._con is None:
+            self.connect()
+        return self._con
+
+    def connect(self):
         self._con = duckdb.connect(
-            database="../orchestration/data/coches.net.duckdb", read_only=True
+            database="../orchestration/data/coches.net.duckdb",
+            read_only=True,
+            config={"access_mode": "READ_ONLY"},
         )
 
     def query_data_by_parameters(
