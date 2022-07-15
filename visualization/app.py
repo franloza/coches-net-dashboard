@@ -1,9 +1,9 @@
 # Run this app with `python app.py` and
 # visit http://127.0.0.1:8050/ in your web browser.
 
-from calendar import c
 from dash import Dash, html, dcc, Input, Output, State, dash_table
-import plotly.express as px
+from dash.exceptions import PreventUpdate
+import pandas as pd
 
 from model.data_provider import DataProvider
 from model import figure_builder
@@ -97,13 +97,9 @@ def update_axis_componenet(vehicle):
 
 
 @app.callback(
-    Output(component_id="data-graph", component_property="figure"),
     Output(component_id="data-table", component_property="columns"),
     Output(component_id="data-table", component_property="data"),
     Input(component_id="search-button", component_property="n_clicks"),
-    Input(component_id="x-dropdown", component_property="value"),
-    Input(component_id="y-dropdown", component_property="value"),
-    Input(component_id="color-dropdown", component_property="value"),
     State(component_id="query-input", component_property="value"),
     State(component_id="km-minimum", component_property="value"),
     State(component_id="km-maximum", component_property="value"),
@@ -113,12 +109,10 @@ def update_axis_componenet(vehicle):
     State(component_id="fuel-checklist", component_property="value"),
     State(component_id="offer-checklist", component_property="value"),
     State(component_id="province-dropdown", component_property="value"),
+    prevent_initial_call=True,
 )
 def update_output_div(
     _,
-    x,
-    y,
-    color,
     title,
     km_min,
     km_max,
@@ -141,9 +135,31 @@ def update_output_div(
         provinces=provinces,
     )
     return (
-        figure_builder.build_price_distribution_figure(data, x=x, y=y, color=color),
         [{"name": i, "id": i} for i in data.columns],
         data.to_dict("records"),
+    )
+
+
+@app.callback(
+    Output(component_id="data-graph", component_property="figure"),
+    Input(component_id="data-table", component_property="data"),
+    Input(component_id="data-table", component_property="derived_virtual_data"),
+    Input(
+        component_id="data-table", component_property="derived_virtual_selected_rows"
+    ),
+    Input(component_id="x-dropdown", component_property="value"),
+    Input(component_id="y-dropdown", component_property="value"),
+    Input(component_id="color-dropdown", component_property="value"),
+    State(component_id="data-graph", component_property="figure"),
+    prevent_initial_call=True,
+)
+def update_chart(data, virtual_data, selected_rows, x, y, color, curr_figure):
+    if virtual_data is not None and len(virtual_data) != len(data):
+        data = virtual_data
+
+    data = pd.DataFrame.from_records(data)
+    return figure_builder.build_price_distribution_figure(
+        data, x=x, y=y, color=color, highlight=selected_rows
     )
 
 
@@ -178,6 +194,9 @@ app.layout = html.Div(
                             id="data-table",
                             page_current=0,
                             page_size=10,
+                            sort_action="native",
+                            filter_action="native",
+                            row_selectable="multi",
                         ),
                     ],
                     type="circle",
