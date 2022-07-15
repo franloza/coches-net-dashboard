@@ -92,7 +92,7 @@ class DataProvider:
                 DISTINCT(fuelType)
                 FROM {vehicle};
             """
-        return [col[0] for col in self._con.cursor().execute(query).fetchall()]
+        return [col[0] for col in self.connection.cursor().execute(query).fetchall()]
 
     def query_offer_types(self, vehicle: str):
         query = f"""
@@ -100,7 +100,7 @@ class DataProvider:
                 DISTINCT(offerType_literal)
                 FROM {vehicle};
             """
-        return [col[0] for col in self._con.cursor().execute(query).fetchall()]
+        return [col[0] for col in self.connection.cursor().execute(query).fetchall()]
 
     def query_provinces(self, vehicle: str):
         query = f"""
