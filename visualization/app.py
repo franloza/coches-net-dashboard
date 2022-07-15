@@ -9,6 +9,7 @@ from model.data_provider import DataProvider
 from model import figure_builder
 
 app = Dash(__name__)
+server = app.server
 
 # Provider for the data from DB
 data_provider = DataProvider()

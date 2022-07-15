@@ -84,9 +84,25 @@ services:
     networks:
       - dagster_network
     volumes:
-      - ./data:/orchestration/data
+      - db-volume:/orchestration/data
     ports:
       - "4444:4444"
+
+  dash:
+    build:
+      context: ./visualization
+      dockerfile: ./Dockerfile
+    image: dash
+    container_name: dash_app
+    networks:
+      - dagster_network
+    volumes:
+      - db-volume:/orchestration/data
+    ports:
+      - "80:80"
+
+volumes:
+     db-volume:
 
 networks:
   dagster_network:
