@@ -2,22 +2,22 @@
 # visit http://127.0.0.1:8050/ in your web browser.
 
 from dash import Dash, html, dcc, Input, Output, State, dash_table
+import dash_bootstrap_components as dbc
 from dash.exceptions import PreventUpdate
 import pandas as pd
 
 from model.data_provider import DataProvider
 from model import figure_builder
 
-app = Dash(__name__)
-server = app.server
+app = Dash(__name__, external_stylesheets=[dbc.themes.SOLAR])
 
 # Provider for the data from DB
 data_provider = DataProvider()
 
 
 def left_panel():
-    return html.Div(
-        style={"float": "left"},
+    return dbc.Card(
+        body=True,
         children=[
             dcc.Input(id="query-input"),
             html.Div(
@@ -163,47 +163,105 @@ def update_chart(data, virtual_data, selected_rows, x, y, color, curr_figure):
     )
 
 
-app.layout = html.Div(
-    style={"width": "100%"},
+@app.callback(
+    Output(component_id="details-information", component_property="children"),
+    Input(
+        component_id="data-table", component_property="derived_virtual_selected_rows"
+    ),
+    State(component_id="data-table", component_property="derived_virtual_data"),
+    prevent_initial_call=True,
+)
+def update_chart(selected_rows, data):
+    if not selected_rows:
+        raise PreventUpdate
+
+    data = pd.DataFrame.from_records(data)
+    elements = []
+    for _, vehicle in data.iloc[selected_rows].iterrows():
+        vehicle_id = vehicle["id"]
+        imgs = data_provider.query_vehicle_resorces("motos", vehicle_id)[0]
+        size = min(5, len(imgs))
+        elements.append(
+            dbc.Card(
+                children=[
+                    dbc.CardBody(
+                        children=[
+                            dbc.Row(
+                                [
+                                    dbc.Carousel(
+                                        items=[
+                                            {"id": f"{i}", "src": res["url"]}
+                                            for i, res in enumerate(imgs[:size])
+                                        ],
+                                        controls=True,
+                                        indicators=True,
+                                        variant="dark",
+                                    )
+                                ]
+                            ),
+                            dbc.Row(
+                                [
+                                    html.Label(vehicle["title"]),
+                                    html.Label(f"Km: {vehicle['km']}"),
+                                    html.Label(f"{vehicle['price']}€"),
+                                    html.Label(f"{vehicle['year']}"),
+                                    html.Label(f"{vehicle['fuelType']}"),
+                                    html.Label(f"{vehicle['mainProvince']}"),
+                                ]
+                            ),
+                        ],
+                    )
+                ]
+            )
+        )
+    return elements
+
+
+app.layout = dbc.Col(
     children=[
-        left_panel(),
-        html.Div(
-            style={"float": "right", "width": "80%", "margin": "auto"},
+        dbc.Row(
             children=[
-                dcc.Loading(
+                dbc.Col(left_panel(), md=4),
+                dbc.Col(
+                    md=8,
                     children=[
-                        html.Div(
-                            style={"display": "inline"},
+                        dcc.Loading(
                             children=[
-                                dcc.Dropdown(
-                                    id="x-dropdown",
-                                    value="price",
+                                html.Div(
+                                    style={"display": "inline"},
+                                    children=[
+                                        dcc.Dropdown(
+                                            id="x-dropdown",
+                                            value="price",
+                                        ),
+                                        dcc.Dropdown(
+                                            id="y-dropdown",
+                                            value="km",
+                                        ),
+                                        dcc.Dropdown(
+                                            id="color-dropdown",
+                                            value="year",
+                                        ),
+                                    ],
                                 ),
-                                dcc.Dropdown(
-                                    id="y-dropdown",
-                                    value="km",
-                                ),
-                                dcc.Dropdown(
-                                    id="color-dropdown",
-                                    value="year",
+                                dcc.Graph(id="data-graph"),
+                                dash_table.DataTable(
+                                    id="data-table",
+                                    page_current=0,
+                                    page_size=10,
+                                    sort_action="native",
+                                    filter_action="native",
+                                    row_selectable="multi",
                                 ),
                             ],
-                        ),
-                        dcc.Graph(id="data-graph"),
-                        dash_table.DataTable(
-                            id="data-table",
-                            page_current=0,
-                            page_size=10,
-                            sort_action="native",
-                            filter_action="native",
-                            row_selectable="multi",
+                            type="circle",
                         ),
                     ],
-                    type="circle",
                 ),
             ],
         ),
-    ],
+        dbc.Container(id="details-information"),
+    ]
 )
 
 if __name__ == "__main__":

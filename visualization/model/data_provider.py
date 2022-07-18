@@ -38,6 +38,7 @@ class DataProvider:
     ) -> pd.DataFrame:
         query = f"""
             SELECT 
+                id,
                 title,
                 km::int as km,
                 year::int as year, 
@@ -108,4 +109,13 @@ class DataProvider:
                 DISTINCT(mainProvince)
                 FROM {vehicle};
             """
-        return [col[0] for col in self._con.cursor().execute(query).fetchall()]
+        return [col[0] for col in self.connection.cursor().execute(query).fetchall()]
+
+    def query_vehicle_resorces(self, vehicle: str, id: str):
+        query = f"""
+            SELECT 
+                resources
+                FROM {vehicle}
+                WHERE id = {id};
+            """
+        return [col[0] for col in self.connection.cursor().execute(query).fetchall()]
