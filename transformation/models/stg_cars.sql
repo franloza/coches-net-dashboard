@@ -18,7 +18,8 @@ select
     warranty_months::int as warranty_months,
     offerType_literal as offer_type,
     hasStock::boolean as has_stock,
-    environmentalLabel as environmental_label
+    environmentalLabel as environmental_label,
+    resources
 from {{ source('coches_net', 'cars') }}
 -- The API produces duplicates due to pagination
 qualify row_number() over (partition by car_id order by published_date desc) = 1

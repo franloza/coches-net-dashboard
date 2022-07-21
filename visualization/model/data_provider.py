@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 import duckdb
 import pandas as pd
 
@@ -5,24 +6,21 @@ import pandas as pd
 class DataProvider:
     """Class in charge of quering data from the DB"""
 
-    def __init__(self) -> None:
+    @contextmanager
+    def _connect(self):
+        # To be used with `with`
         try:
-            self.connect()
-        except RuntimeError:
-            self._con = None
+            con = duckdb.connect(
+                database="../orchestration/data/coches.net.duckdb",
+                read_only=True,
+                config={"access_mode": "READ_ONLY"},
+            )
+            yield con
+        finally:
+            con.close()
 
-    @property
-    def connection(self):
-        if self._con is None:
-            self.connect()
-        return self._con
-
-    def connect(self):
-        self._con = duckdb.connect(
-            database="../orchestration/data/coches.net.duckdb",
-            read_only=True,
-            config={"access_mode": "READ_ONLY"},
-        )
+    def _get_target_table(self, vehicle: str):
+        return "stg_cars" if vehicle == "coches" else "stg_motorcycles"
 
     def query_data_by_parameters(
         self,
@@ -36,18 +34,11 @@ class DataProvider:
         offer: list = None,
         provinces: list = None,
     ) -> pd.DataFrame:
+        table = self._get_target_table(vehicle)
         query = f"""
             SELECT 
-                id,
-                title,
-                km::int as km,
-                year::int as year, 
-                cubicCapacity,
-                location_mainProvince as mainProvince, 
-                fuelType,
-                publishedDate::timestamp as publishedDate,
-                price_amount as price,
-                FROM {vehicle} 
+               *
+            FROM analytics.{table}
             WHERE 
         """
 
@@ -70,14 +61,14 @@ class DataProvider:
         if fuel is not None and fuel:
             query += "("
             for elem in fuel:
-                query += f"fuelType = '{elem}' OR "
+                query += f"fuel_type = '{elem}' OR "
             query = query[:-4]
             query += ") "
             query += "AND "
         # Offer
         # Province
         if provinces is not None and provinces:
-            query += "mainProvince IN ("
+            query += "main_province IN ("
             for elem in provinces:
                 query += f"'{elem}',"
             query += ") AND "
@@ -85,37 +76,51 @@ class DataProvider:
         # To ease the filters append each one includes and "AND " at the end
         # Remove the last one from the query before execute
         query = query[:-5]
-        return self._con.cursor().execute(query).df()
+        with self._connect() as con:
+            df = con.cursor().execute(query).df()
+        return df
 
     def query_fuel_types(self, vehicle: str):
+        table = self._get_target_table(vehicle)
         query = f"""
             SELECT 
-                DISTINCT(fuelType)
-                FROM {vehicle};
+                DISTINCT(fuel_type)
+                FROM analytics.{table};
             """
-        return [col[0] for col in self.connection.cursor().execute(query).fetchall()]
+        with self._connect() as con:
+            elems = [col[0] for col in con.cursor().execute(query).fetchall()]
+        return elems
 
     def query_offer_types(self, vehicle: str):
+        table = self._get_target_table(vehicle)
         query = f"""
             SELECT 
-                DISTINCT(offerType_literal)
-                FROM {vehicle};
+                DISTINCT(offer_type)
+                FROM analytics.{table};
             """
-        return [col[0] for col in self.connection.cursor().execute(query).fetchall()]
+        with self._connect() as con:
+            elems = [col[0] for col in con.cursor().execute(query).fetchall()]
+        return elems
 
     def query_provinces(self, vehicle: str):
+        table = self._get_target_table(vehicle)
         query = f"""
             SELECT 
-                DISTINCT(mainProvince)
-                FROM {vehicle};
+                DISTINCT(main_province)
+                FROM analytics.{table};
             """
-        return [col[0] for col in self.connection.cursor().execute(query).fetchall()]
+        with self._connect() as con:
+            elems = [col[0] for col in con.cursor().execute(query).fetchall()]
+        return elems
 
     def query_vehicle_resorces(self, vehicle: str, id: str):
+        table = self._get_target_table(vehicle)
         query = f"""
             SELECT 
                 resources
-                FROM {vehicle}
+                FROM analytics.{table}
                 WHERE id = {id};
             """
-        return [col[0] for col in self.connection.cursor().execute(query).fetchall()]
+        with self._connect() as con:
+            elems = [col[0] for col in con.cursor().execute(query).fetchall()]
+        return elems

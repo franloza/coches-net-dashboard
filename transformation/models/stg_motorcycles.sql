@@ -14,7 +14,8 @@ select
     publishedDate::timestamp as published_date,
     price_amount as price,
     warranty_literal as warranty,
-    offerType_literal as offer_type
+    offerType_literal as offer_type,
+    resources
 from {{ source('coches_net', 'motorcycles') }}
 -- The API produces duplicates due to pagination
 qualify row_number() over (partition by motorcycle_id order by published_date desc) = 1
