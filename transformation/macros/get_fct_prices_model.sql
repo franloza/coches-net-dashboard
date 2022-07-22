@@ -1,6 +1,6 @@
 {% macro get_fct_prices_model(vehicle_type) %}
 
-{% set primary_key = vehicle_type + '_id' %}
+{% set primary_key = 'id' %}
 {% set vehicle_type_plural = vehicle_type + 's' %}
 
 with {{ vehicle_type_plural }} as (

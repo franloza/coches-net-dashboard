@@ -1,6 +1,6 @@
 select
     dbt_scd_id as scd_id,
-    id as motorcycle_id,
+    id,
     creationDate::timestamp as creation_date,
     title,
     'www.motos.net' || url as url,

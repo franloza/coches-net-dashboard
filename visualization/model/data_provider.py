@@ -40,7 +40,7 @@ class DataProvider:
         table = self._get_vehicle_table(vehicle)
         query = f"""
             SELECT 
-               {'motorcycle_id' if vehicle == "motos" else 'car_id'},
+               id,
                title,
                km,
                year,
@@ -128,7 +128,7 @@ class DataProvider:
             SELECT 
                 resources
             FROM analytics.{table}
-            WHERE motorcycle_id = {id};
+            WHERE id = {id};
             """
         elems = []
         with self._connect() as con:
@@ -142,7 +142,7 @@ class DataProvider:
                 date_key,
                 price
             FROM analytics.{table}
-            WHERE motorcycle_id = {vehicle_id}
+            WHERE id = {vehicle_id}
         """
         with self._connect() as con:
             df = con.cursor().execute(query).df()

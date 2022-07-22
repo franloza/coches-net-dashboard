@@ -1,5 +1,5 @@
 select
-    id as car_id,
+    id,
     creationDate::timestamp as creation_date,
     title,
     'www.coches.net' || url as url,
@@ -22,4 +22,4 @@ select
     resources
 from {{ source('coches_net', 'cars') }}
 -- The API produces duplicates due to pagination
-qualify row_number() over (partition by car_id order by published_date desc) = 1
+qualify row_number() over (partition by id order by published_date desc) = 1

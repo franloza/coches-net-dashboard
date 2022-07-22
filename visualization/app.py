@@ -198,7 +198,7 @@ def show_details(selected_rows, data, vehicle):
     data = pd.DataFrame.from_records(data)
     elements = []
     for _, vehicle_data in data.iloc[selected_rows].iterrows():
-        vehicle_id = vehicle_data["motorcycle_id"]
+        vehicle_id = vehicle_data["id"]
         imgs = data_provider.query_vehicle_resorces("motos", vehicle_id)[0]
         size = min(5, len(imgs))
         price_data = data_provider.get_price_over_time(vehicle, vehicle_id)

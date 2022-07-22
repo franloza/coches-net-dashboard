@@ -1,6 +1,6 @@
 select
     dbt_scd_id as scd_id,
-    id as car_id,
+    id,
     creationDate::timestamp as creation_date,
     title,
     'www.coches.net' || url as url,
