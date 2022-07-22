@@ -228,7 +228,6 @@ def show_details(selected_rows, data, vehicle):
                                         ),
                                     ),
                                 ],
-                                className="g-0 d-flex align-items-center",
                             ),
                             dbc.Row(
                                 [
@@ -241,7 +240,6 @@ def show_details(selected_rows, data, vehicle):
                                         html.Div(f"{vehicle_data['main_province']}")
                                     ),
                                 ],
-                                justify="around",
                             ),
                         ],
                     )
@@ -261,20 +259,34 @@ app.layout = dbc.Col(
                     children=[
                         dcc.Loading(
                             children=[
-                                html.Div(
-                                    style={"display": "inline"},
+                                dbc.Row(
                                     children=[
-                                        dcc.Dropdown(
-                                            id="x-dropdown",
-                                            value="price",
+                                        dbc.Col(
+                                            [
+                                                html.Div("X"),
+                                                dcc.Dropdown(
+                                                    id="x-dropdown",
+                                                    value="price",
+                                                ),
+                                            ],
                                         ),
-                                        dcc.Dropdown(
-                                            id="y-dropdown",
-                                            value="km",
+                                        dbc.Col(
+                                            [
+                                                html.Div("Y"),
+                                                dcc.Dropdown(
+                                                    id="y-dropdown",
+                                                    value="km",
+                                                ),
+                                            ]
                                         ),
-                                        dcc.Dropdown(
-                                            id="color-dropdown",
-                                            value="year",
+                                        dbc.Col(
+                                            [
+                                                html.Div("Color"),
+                                                dcc.Dropdown(
+                                                    id="color-dropdown",
+                                                    value="year",
+                                                ),
+                                            ]
                                         ),
                                     ],
                                 ),

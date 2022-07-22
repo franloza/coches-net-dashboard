@@ -33,6 +33,7 @@ def build_general_scatter_figure(
         size=[0.1 if _ not in highlight else 0.75 for _ in range(len(data))]
         if highlight is not None and highlight
         else None,
+        hover_data=["motorcycle_id", "price", "km", "year"],
     )
 
 
