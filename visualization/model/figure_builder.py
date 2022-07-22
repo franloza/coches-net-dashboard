@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 
 
-def build_price_distribution_figure(
+def build_general_scatter_figure(
     data: pd.DataFrame, x: str, y: str, color: str = None, highlight: list = None
 ):
     """Returns a figure with the price distributions of the elements in `data`.
@@ -34,3 +34,16 @@ def build_price_distribution_figure(
         if highlight is not None and highlight
         else None,
     )
+
+
+def build_price_timeseries_figura(data):
+    """Returns a timeseries line chart with the prices over time.
+
+    Args:
+        data (pd.DataFrame): Data to plot. Must contain the columns `date_key` and `price`
+    """
+    if not {"date_key", "price"}.issubset(data.columns):
+        raise ValueError(
+            "Required columns `date_key` and `price` are missing in the data."
+        )
+    return px.line(data, x="date_key", y="price", markers="o")

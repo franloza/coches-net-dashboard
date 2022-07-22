@@ -19,10 +19,13 @@ class DataProvider:
         finally:
             con.close()
 
-    def _get_target_table(self, vehicle: str):
+    def _get_vehicle_table(self, vehicle: str):
         return "stg_cars" if vehicle == "coches" else "stg_motorcycles"
 
-    def query_data_by_parameters(
+    def _get_price__table(self, vehicle: str):
+        return "fct_car_prices" if vehicle == "coches" else "fct_motorcycle_prices"
+
+    def query_general_data_by_parameters(
         self,
         vehicle: str,
         title: str = None,
@@ -34,10 +37,16 @@ class DataProvider:
         offer: list = None,
         provinces: list = None,
     ) -> pd.DataFrame:
-        table = self._get_target_table(vehicle)
+        table = self._get_vehicle_table(vehicle)
         query = f"""
             SELECT 
-               *
+               {'motorcycle_id' if vehicle == "motos" else 'car_id'},
+               title,
+               km,
+               year,
+               main_province,
+               fuel_type,
+               price
             FROM analytics.{table}
             WHERE 
         """
@@ -81,46 +90,60 @@ class DataProvider:
         return df
 
     def query_fuel_types(self, vehicle: str):
-        table = self._get_target_table(vehicle)
+        table = self._get_vehicle_table(vehicle)
         query = f"""
             SELECT 
                 DISTINCT(fuel_type)
-                FROM analytics.{table};
+            FROM analytics.{table};
             """
         with self._connect() as con:
             elems = [col[0] for col in con.cursor().execute(query).fetchall()]
         return elems
 
     def query_offer_types(self, vehicle: str):
-        table = self._get_target_table(vehicle)
+        table = self._get_vehicle_table(vehicle)
         query = f"""
             SELECT 
                 DISTINCT(offer_type)
-                FROM analytics.{table};
+            FROM analytics.{table};
             """
         with self._connect() as con:
             elems = [col[0] for col in con.cursor().execute(query).fetchall()]
         return elems
 
     def query_provinces(self, vehicle: str):
-        table = self._get_target_table(vehicle)
+        table = self._get_vehicle_table(vehicle)
         query = f"""
             SELECT 
                 DISTINCT(main_province)
-                FROM analytics.{table};
+            FROM analytics.{table};
             """
         with self._connect() as con:
             elems = [col[0] for col in con.cursor().execute(query).fetchall()]
         return elems
 
     def query_vehicle_resorces(self, vehicle: str, id: str):
-        table = self._get_target_table(vehicle)
+        table = self._get_vehicle_table(vehicle)
         query = f"""
             SELECT 
                 resources
-                FROM analytics.{table}
-                WHERE id = {id};
+            FROM analytics.{table}
+            WHERE motorcycle_id = {id};
             """
+        elems = []
         with self._connect() as con:
             elems = [col[0] for col in con.cursor().execute(query).fetchall()]
         return elems
+
+    def get_price_over_time(self, vehicle: str, vehicle_id: str):
+        table = self._get_price__table(vehicle)
+        query = f"""
+            SELECT
+                date_key,
+                price
+            FROM analytics.{table}
+            WHERE motorcycle_id = {vehicle_id}
+        """
+        with self._connect() as con:
+            df = con.cursor().execute(query).df()
+        return df
