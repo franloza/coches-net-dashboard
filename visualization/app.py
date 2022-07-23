@@ -10,7 +10,7 @@ import plotly.express as px
 from model.data_provider import DataProvider
 from model import figure_builder
 
-app = Dash(__name__, external_stylesheets=[dbc.themes.SOLAR])
+app = Dash(__name__, external_stylesheets=[dbc.themes.MORPH])
 server = app.server
 
 # Provider for the data from DB
@@ -49,7 +49,7 @@ def left_panel():
             ),
             html.Label("Main Province"),
             dcc.Dropdown(id="province-dropdown", multi=True, searchable=True),
-            html.Button("Search", id="search-button"),
+            html.Button("Search", id="search-button", className="btn btn-primary"),
         ],
     )
 
@@ -199,7 +199,7 @@ def show_details(selected_rows, data, vehicle):
     elements = []
     for _, vehicle_data in data.iloc[selected_rows].iterrows():
         vehicle_id = vehicle_data["id"]
-        imgs = data_provider.query_vehicle_resorces("motos", vehicle_id)[0]
+        imgs = data_provider.query_vehicle_resorces(vehicle, vehicle_id)[0]
         size = min(5, len(imgs))
         price_data = data_provider.get_price_over_time(vehicle, vehicle_id)
         elements.append(
