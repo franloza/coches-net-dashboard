@@ -1,19 +1,12 @@
 from dagster import schedule
 
-from jobs import build_datasets_job
+from jobs import build_datasets_job, PROD_CONFIG
 
 
 @schedule(
-    cron_schedule="0 * * * *",
+    cron_schedule="0 0 * * *",
     job=build_datasets_job,
-    execution_timezone="US/Central",
+    execution_timezone="UTC",
 )
-def build_cars_dataset_schedule(_context):
-    """
-    A schedule definition. This example schedule runs once each hour.
-
-    For more hints on running jobs with schedules in Dagster, see our documentation overview on
-    schedules:
-    https://docs.dagster.io/overview/schedules-sensors/schedules
-    """
-    return {}
+def build_cars_dataset_schedule(context):
+    return PROD_CONFIG
