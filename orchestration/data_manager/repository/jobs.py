@@ -24,6 +24,19 @@ LOCAL_CONFIG = {
         }
     },
 }
+PROD_CONFIG = {
+    "execution": {"config": {"in_process": {}}},
+    "resources": {
+        "warehouse_io_manager": {
+            "config": {
+                "download_dir": "/tmp/",
+                "duckdb_path": os.path.abspath(
+                    file_relative_path(__file__, f"../../data/{DATABASE_FILE_NAME}")
+                ),
+            }
+        }
+    },
+}
 
 
 @job(
