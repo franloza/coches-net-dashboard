@@ -29,6 +29,18 @@ To download the data, go to the [Dagster Dashboard](http://localhost:3000), go t
 After all processes have been completed, go to the [Dash Dashboard](http://localhost:80), add some filters and click "Search" to
 visualize the data.
 
+The process to download the data can take a while to finish. If you want to limit the amount of data that is downloaded,
+you can add the following configuration in the Launchpad:
+```yaml
+ops:
+  download_coches:
+    config:
+      max_items: <maximum number of cars to download>
+  download_motos:
+    config:
+      max_items: <maximum number of motorcycles to download>
+```
+
 ## Screenshots
 
 ![DAG](./img/dag.png)
