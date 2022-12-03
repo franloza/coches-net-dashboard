@@ -1,15 +1,12 @@
 # Coches.net dataset ingestion with Dagster
 
-## Deployment (containerized)
-1. Run `docker-compose build`
-2. Run `docker-compose up`
+Inspired by [Hacker News Demo Pipelines](https://github.com/dagster-io/dagster/tree/main/examples/hacker_news)
 
-**Warning** By default the job will persist all data inside the `/tmp` folder of the container. There is a volumne
-set up to map a folder `data` to `/tmp`. The folder `data` must be at the same level as the `docker-compose` file.
+### Contents
 
-## Deployment (local dagit)
-1. Open file `workspace.yaml`
-2. Uncomment the `python_file` block
-    - To supress errors you can comment the `grpc_server` block, but it is not necessarily.
-3. Make sure the `executable_path` path is pointing to your python virtual environment.
-4. Run `dagit`
+| Name                   | Description                                                                       |
+|------------------------|-----------------------------------------------------------------------------------|
+| `README.md`            | A description and guide for this code repository                                  |
+| `setup.py`             | A build script with Python package dependencies for this code repository          |
+| `workspace.yaml`       | A file that specifies the location of the user code for Dagit and the Dagster CLI |
+| `data_manager/`        | A Python directory that contains code for the Dagster repository                  |

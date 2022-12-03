@@ -2,14 +2,14 @@ import os
 from dagster import job, file_relative_path
 from dagster_dbt import dbt_cli_resource, dbt_snapshot_op, dbt_build_op
 
-from ops import download_items_op_factory
-from resources.coches_net import coches_net_resource
-from resources.duckdb_parquet_io_manager import duckdb_parquet_io_manager
+from .ops import download_items_op_factory
+from .resources.coches_net import coches_net_resource
+from .resources.duckdb_parquet_io_manager import duckdb_parquet_io_manager
 
 
 DATABASE_FILE_NAME = "coches.net.duckdb"
 TRANSFORMATION_DIR = os.path.abspath(
-    file_relative_path(__file__, "../../../transformation")
+    file_relative_path(__file__, "../../transformation")
 )
 LOCAL_CONFIG = {
     "execution": {"config": {"in_process": {}}},
@@ -59,13 +59,3 @@ def build_datasets_job():
     # Transform data
     dbt_build_op(start_after=dbt_snapshot_op([cars, motorbikes]))
 
-
-if __name__ == "__main__":
-    dev_config = dict(LOCAL_CONFIG)
-    # Uncomment to limit the number of records
-    # max_items = 1000
-    # dev_config['ops'] = {
-    #    'download_coches': {'config': {'max_items': max_items}},
-    #    'download_motos': {'config': {'max_items': max_items}}
-    # }
-    build_datasets_job.execute_in_process(run_config=dev_config)

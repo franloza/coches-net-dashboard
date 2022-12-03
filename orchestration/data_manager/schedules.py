@@ -1,6 +1,6 @@
 from dagster import schedule
 
-from jobs import build_datasets_job, PROD_CONFIG
+from .jobs import build_datasets_job, PROD_CONFIG
 
 
 @schedule(

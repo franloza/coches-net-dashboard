@@ -16,9 +16,6 @@ services:
   # Since our instance uses the QueuedRunCoordinator, any runs submitted from dagit will be put on
   # a queue and later dequeued and launched by dagster-daemon.
   dagster_dagit:
-    build:
-      context: ./orchestration
-      dockerfile: ./Dockerfile
     image: dagster
     entrypoint:
       - dagit
@@ -48,9 +45,6 @@ services:
   # This service runs the dagster-daemon process, which is responsible for taking runs
   # off of the queue and launching them, as well as creating runs from schedules or sensors.
   dagster_daemon:
-    build:
-      context: ./orchestration
-      dockerfile: ./Dockerfile
     image: dagster
     entrypoint:
       - dagster-daemon
@@ -71,11 +65,18 @@ services:
 
   # Repositories
   data_manager:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
+    entrypoint:
+      - dagster
+      - api
+      - grpc
+      - -h
+      - "0.0.0.0"
+      - -p
+      - "4444"
+      - --package-name
+      - data_manager
     container_name: data_manager
-    image: data_manager_image
+    image: dagster
     environment:
       DAGSTER_CURRENT_IMAGE: "data_manager_image"
       DAGSTER_POSTGRES_USER: "dagster"
@@ -84,7 +85,7 @@ services:
     networks:
       - dagster_network
     volumes:
-      - db-volume:/orchestration/data
+      - ./data:/app/data
     ports:
       - "4444:4444"
 
@@ -97,12 +98,9 @@ services:
     networks:
       - dagster_network
     volumes:
-      - db-volume:/orchestration/data
+      - ./data:/app/data
     ports:
       - "80:80"
-
-volumes:
-     db-volume:
 
 networks:
   dagster_network:
