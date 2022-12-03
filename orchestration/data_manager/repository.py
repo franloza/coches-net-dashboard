@@ -1,7 +1,7 @@
 from dagster import repository
 
-from jobs import build_datasets_job
-from schedules import build_cars_dataset_schedule
+from .jobs import build_datasets_job
+from .schedules import build_cars_dataset_schedule
 
 
 @repository

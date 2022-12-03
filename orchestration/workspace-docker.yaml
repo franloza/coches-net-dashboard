@@ -1,0 +1,5 @@
+load_from:
+  - grpc_server:
+      host: data_manager
+      port: 4444
+      location_name: "data_manager_repository"

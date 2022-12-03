@@ -51,3 +51,6 @@ event_log_storage:
       db_name:
         env: DAGSTER_POSTGRES_DB
       port: 5432
+
+telemetry:
+  enabled: false

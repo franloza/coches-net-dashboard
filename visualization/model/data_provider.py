@@ -9,15 +9,17 @@ class DataProvider:
     @contextmanager
     def _connect(self):
         # To be used with `with`
+        con = None
         try:
             con = duckdb.connect(
-                database="../orchestration/data/coches.net.duckdb",
+                database="../data/coches.net.duckdb",
                 read_only=True,
                 config={"access_mode": "READ_ONLY"},
             )
             yield con
         finally:
-            con.close()
+            if con:
+                con.close()
 
     def _get_vehicle_table(self, vehicle: str):
         return "stg_cars" if vehicle == "coches" else "stg_motorcycles"
